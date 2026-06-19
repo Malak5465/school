@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# ⚙️ إعدادات الربط بـ Supabase (تم إدخال بياناتكِ الحقيقية)
+# ⚙️ إعدادات الربط بـ Supabase (بياناتكِ الحقيقية مفعلة)
 # ----------------------------------------------------
 SUPABASE_URL = "https://wuozdbisjktrtxarfztq.supabase.co"
 SUPABASE_KEY = "sb_publishable_GWhRuvE8hwV2ACeegoG2cw_1J7sd0S2"
@@ -36,7 +36,7 @@ st.write("---")
 tab1, tab2, tab3 = st.tabs(["➕ إدارة الطالبات", "📝 رصد التقييم اليومي", "🎓 الشهادات والنتائج"])
 
 # ----------------------------------------------------
-# التبويب الأول: إدارة الطالبات (إضافة أسماء إلى السحاب)
+# التبويب الأول: إدارة الطالبات
 # ----------------------------------------------------
 with tab1:
     st.subheader("👧 إضافة طفلة جديدة للفصل")
@@ -46,13 +46,11 @@ with tab1:
         if new_student.strip() != "":
             student_name_clean = new_student.strip()
             try:
-                # التحقق إذا كان الاسم مضافاً مسبقاً في جدول سوبابيس
                 check_exist = supabase.table("students").select("*").eq("name", student_name_clean).execute()
                 
                 if check_exist.data:
                     st.warning("⚠️ هذه الطفلة مضافة بالفعل في الفصل.")
                 else:
-                    # إدخال الاسم يدوياً وبشكل دائم
                     supabase.table("students").insert({"name": student_name_clean}).execute()
                     st.success(f"✅ تم حفظ الطفلة ({student_name_clean}) في قاعدة البيانات بنجاح!")
             except Exception as e:
@@ -60,7 +58,7 @@ with tab1:
         else:
             st.error("❌ الرجاء كتابة اسم الطفلة أولاً.")
 
-# جلب قائمة أسماء الفصل من سوبابيس بشكل حي لتغذية باقي التبويبات
+# جلب قائمة أسماء الفصل من سوبابيس
 try:
     db_students = supabase.table("students").select("name").execute()
     students_list = [row["name"] for row in db_students.data] if db_students.data else []
@@ -82,7 +80,6 @@ with tab2:
         st.write("---")
         st.markdown("#### 🌟 معايير التقييم (من 1 إلى 5 نجوم):")
         
-        # المعايير الأربعة المطلوبة
         behavior = st.slider("⭐ السلوك المتميز:", 1, 5, 5)
         hygiene = st.slider("⭐ النظافة والترتيب:", 1, 5, 5)
         participation = st.slider("⭐ المشاركة والتفاعل:", 1, 5, 5)
@@ -93,7 +90,6 @@ with tab2:
         if st.button("حفظ التقييم السحابي"):
             day_total = behavior + hygiene + participation + activities
             try:
-                # تجهيز البيانات للإرسال إلى جدول evaluations
                 eval_data = {
                     "student_name": selected_student,
                     "day_number": selected_day,
@@ -123,7 +119,6 @@ with tab3:
     if not eval_records:
         st.info("💡 لم يتم حفظ أي تقييمات في سوبابيس بعد.")
     else:
-        # عرض البيانات في جدول تفاعلي أنيق ومحدث
         df = pd.DataFrame(eval_records)
         st.dataframe(df[["student_name", "day_number", "total"]], use_container_width=True)
         
@@ -132,20 +127,69 @@ with tab3:
         
         student_to_certify = st.selectbox("اختار الطالبة لإصدار الشهادة:", list(set(df["student_name"])))
         
-        # حساب إجمالي درجات اليومين للطالبة المحددة من جدول سوبابيس
         student_rows = df[df["student_name"] == student_to_certify]
         final_score = int(student_rows["total"].sum())
         
         st.metric(label=f"المجموع الإجمالي لـ {student_to_certify} (من 40 درجة):", value=f"{final_score} / 40")
         
-        # الفحص التلقائي وإطلاق اللقب
+        # تحديد اللقب الألوان وشكل الشهادة بناءً على الدرجة
+        if final_score == 40:
+            title = "نجم الأسبوع الخارق 👑"
+            bg_color = "#FFFDF0"  # خلفية ذهبية هادئة
+            border_color = "#D4AF37"  # إطار ذهبي
+            title_color = "#D4AF37"
+        elif final_score >= 32:
+            title = "البطل المتميز ✨"
+            bg_color = "#F4F9FF"  # خلفية زرقاء ملكية هادئة
+            border_color = "#4A90E2"  # إطار أزرق
+            title_color = "#4A90E2"
+        else:
+            title = "البطل المجتهد 👍"
+            bg_color = "#FBFBFB"  # خلفية رمادية بيضاء ناصعة
+            border_color = "#A0A0A0"  # إطار فضي
+            title_color = "#7F8C8D"
+            
         if final_score == 40:
             st.balloons()
-            st.success("🏆 اللقب المستحق تلقائياً: **نجم الأسبوع الخارق** 👑")
+            st.success(f"🏆 اللقب المستحق تلقائياً: **{title}**")
         elif final_score >= 32:
-            st.info("🌟 اللقب المستحق تلقائياً: **البطل المتميز** ✨")
+            st.info(f"🌟 اللقب المستحق تلقائياً: **{title}**")
         else:
-            st.warning("👍 اللقب المستحق تلقائياً: **البطل المجتهد** (بحاجة لبعض التحسين)")
+            st.warning(f"👍 اللقب المستحق تلقائياً: **{title}** (بحاجة لبعض التحسين)")
             
+        # زر توليد الشهادة الفعلي داخل التطبيق
         if st.button("🖨️ توليد وتحميل الشهادة"):
-            st.info("⚙️ الخطوة القادمة والأخيرة هي ربط قالب الصورة الفعلي لطباعة هذه البيانات عليه!")
+            certificate_html = f"""
+            <div style="
+                border: 10px double {border_color};
+                padding: 35px;
+                text-align: center;
+                background-color: {bg_color};
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                direction: rtl;
+                border-radius: 15px;
+                box-shadow: 0px 4px 20px rgba(0,0,0,0.15);
+                margin-top: 25px;
+                position: relative;
+            ">
+                <h1 style="color: {title_color}; margin-bottom: 5px; font-size: 32px;">📜 شهادة تميز وتقدير 📜</h1>
+                <p style="font-size: 18px; color: #555; margin-top: 10px;">تتقدم الأستاذة <strong style="color: #333;">ملاك</strong> بكل فخر واعتزاز بمنح هذه الشهادة للطفل/ة:</p>
+                
+                <h2 style="color: #2C3E50; font-size: 34px; margin: 20px 0; border-bottom: 3px dashed {border_color}; display: inline-block; padding: 0 40px; font-weight: bold;">
+                    {student_to_certify}
+                </h2>
+                
+                <p style="font-size: 18px; color: #555;">وذلك لتألقه/ا الملحوظ في الفصل وتحقيق لقب:</p>
+                <h3 style="color: #E74C3C; font-size: 28px; margin: 15px 0; font-weight: bold;">🌟 {title} 🌟</h3>
+                
+                <p style="font-size: 16px; color: #7F8C8D; margin-top: 20px;">
+                    بمجموع درجات: <strong style="color: #27AE60; font-size: 22px;">{final_score} من 40</strong> في التقييم اليومي المتميز.
+                </p>
+                
+                <div style="margin-top: 40px; font-size: 16px; color: #555; text-align: left; padding-left: 20px;">
+                    <span>مع تحيات: <strong>أستاذة ملاك 🌸</strong></span>
+                </div>
+            </div>
+            """
+            st.markdown(certificate_html, unsafe_allow_html=True)
+            st.success("📸 ظهرت الشهادة بالأسفل! يمكنكِ الآن تصوير الشاشة (Screenshot) بسهولة لإرسالها فوراً لواتساب الأهل!")
