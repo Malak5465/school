@@ -132,21 +132,21 @@ with tab3:
         
         st.metric(label=f"المجموع الإجمالي لـ {student_to_certify} (من 40 درجة):", value=f"{final_score} / 40")
         
-        # تحديد اللقب الألوان وشكل الشهادة بناءً على الدرجة
+        # تحديد الألقاب والألوان بناءً على الدرجة
         if final_score == 40:
             title = "نجم الأسبوع الخارق 👑"
-            bg_color = "#FFFDF0"  # خلفية ذهبية هادئة
-            border_color = "#D4AF37"  # إطار ذهبي
+            bg_color = "#FFFDF0"
+            border_color = "#D4AF37"
             title_color = "#D4AF37"
         elif final_score >= 32:
             title = "البطل المتميز ✨"
-            bg_color = "#F4F9FF"  # خلفية زرقاء ملكية هادئة
-            border_color = "#4A90E2"  # إطار أزرق
+            bg_color = "#F4F9FF"
+            border_color = "#4A90E2"
             title_color = "#4A90E2"
         else:
             title = "البطل المجتهد 👍"
-            bg_color = "#FBFBFB"  # خلفية رمادية بيضاء ناصعة
-            border_color = "#A0A0A0"  # إطار فضي
+            bg_color = "#FBFBFB"
+            border_color = "#A0A0A0"
             title_color = "#7F8C8D"
             
         if final_score == 40:
@@ -158,38 +158,83 @@ with tab3:
             st.warning(f"👍 اللقب المستحق تلقائياً: **{title}** (بحاجة لبعض التحسين)")
             
         # زر توليد الشهادة الفعلي داخل التطبيق
-        if st.button("🖨️ توليد وتحميل الشهادة"):
-            certificate_html = f"""
-            <div style="
-                border: 10px double {border_color};
+        if st.button("🖨️ توليد شهادة نظيفة جاهزة للطباعة"):
+            
+            # قالب التصميم الجديد والآمن لمنع اللخابيط والرموز
+            html_template = """
+            <div id="cert-print-area" style="
+                border: 10px double __BORDER__;
                 padding: 35px;
                 text-align: center;
-                background-color: {bg_color};
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: __BG__;
+                font-family: 'Arial', sans-serif;
                 direction: rtl;
                 border-radius: 15px;
-                box-shadow: 0px 4px 20px rgba(0,0,0,0.15);
                 margin-top: 25px;
-                position: relative;
+                box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
             ">
-                <h1 style="color: {title_color}; margin-bottom: 5px; font-size: 32px;">📜 شهادة تميز وتقدير 📜</h1>
+                <h1 style="color: __TCOLOR__; margin-bottom: 5px; font-size: 32px;">📜 شهادة تميز وتقدير 📜</h1>
                 <p style="font-size: 18px; color: #555; margin-top: 10px;">تتقدم الأستاذة <strong style="color: #333;">ملاك</strong> بكل فخر واعتزاز بمنح هذه الشهادة للطفل/ة:</p>
                 
-                <h2 style="color: #2C3E50; font-size: 34px; margin: 20px 0; border-bottom: 3px dashed {border_color}; display: inline-block; padding: 0 40px; font-weight: bold;">
-                    {student_to_certify}
+                <h2 style="color: #2C3E50; font-size: 34px; margin: 20px 0; border-bottom: 3px dashed __BORDER__; display: inline-block; padding: 0 40px; font-weight: bold;">
+                    __NAME__
                 </h2>
                 
                 <p style="font-size: 18px; color: #555;">وذلك لتألقه/ا الملحوظ في الفصل وتحقيق لقب:</p>
-                <h3 style="color: #E74C3C; font-size: 28px; margin: 15px 0; font-weight: bold;">🌟 {title} 🌟</h3>
+                <h3 style="color: #E74C3C; font-size: 28px; margin: 15px 0; font-weight: bold;">🌟 __TITLE__ 🌟</h3>
                 
                 <p style="font-size: 16px; color: #7F8C8D; margin-top: 20px;">
-                    بمجموع درجات: <strong style="color: #27AE60; font-size: 22px;">{final_score} من 40</strong> في التقييم اليومي المتميز.
+                    بمجموع درجات: <strong style="color: #27AE60; font-size: 22px;">__SCORE__ من 40</strong> في التقييم اليومي المتميز.
                 </p>
                 
                 <div style="margin-top: 40px; font-size: 16px; color: #555; text-align: left; padding-left: 20px;">
                     <span>مع تحيات: <strong>أستاذة ملاك 🌸</strong></span>
                 </div>
             </div>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <button onclick="window.print()" style="
+                    background-color: #27AE60;
+                    color: white;
+                    border: none;
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+                ">
+                    💾 اضغطي هنا لحفظ الشهادة كـ PDF أو طباعتها فوراً
+                </button>
+            </div>
+
+            <style>
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #cert-print-area, #cert-print-area * {
+                        visibility: visible;
+                    }
+                    #cert-print-area {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        border: 8px double __BORDER__ !important;
+                        box-shadow: none !important;
+                        padding: 20px !important;
+                    }
+                }
+            </style>
             """
+            
+            # دمج البيانات بأمان تام داخل التصميم
+            certificate_html = html_template.replace("__BORDER__", border_color)\
+                                            .replace("__BG__", bg_color)\
+                                            .replace("__TCOLOR__", title_color)\
+                                            .replace("__NAME__", student_to_certify)\
+                                            .replace("__TITLE__", title)\
+                                            .replace("__SCORE__", str(final_score))
+                                            
             st.markdown(certificate_html, unsafe_allow_html=True)
-            st.success("📸 ظهرت الشهادة بالأسفل! يمكنكِ الآن تصوير الشاشة (Screenshot) بسهولة لإرسالها فوراً لواتساب الأهل!")
