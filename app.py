@@ -10,11 +10,10 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# ⚙️ إعدادات الربط بـ Supabase (ضعي بياناتكِ هنا)
+# ⚙️ إعدادات الربط بـ Supabase (تم إدخال بياناتكِ الحقيقية)
 # ----------------------------------------------------
-# امسحي العبارات المكتوبة وضعي مكانها الروابط الخاصة بمشروعك من إعدادات Supabase
-SUPABASE_URL = "رابط_مشروعك_هنا"
-SUPABASE_KEY = "مفتاح_anon_هنا"
+SUPABASE_URL = "https://wuozdbisjktrtxarfztq.supabase.co"
+SUPABASE_KEY = "sb_publishable_GWhRuvE8hwV2ACeegoG2cw_1J7sd0S2"
 
 # الاتصال التلقائي بقاعدة البيانات السحابية
 @st.cache_resource
