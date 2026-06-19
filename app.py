@@ -9,8 +9,8 @@ st.set_page_config(
 )
 
 # تصميم واجهة ترحيبية أنيقة باللغة العربية
-st.markdown("<h1 style='text-align: center; color: #4A90E2;'>🌟 برنامج تقييم الأطفال اليومي 🌟</h1>", unsafe_style_allowed=True)
-st.markdown("<p style='text-align: center; color: #777;'>أهلاً بكِ يا أستاذة ملاك. يمكنكِ رصد التقييمات وإصدار الشهادات بكل بساطة.</p>", unsafe_style_allowed=True)
+st.markdown("<h1 style='text-align: center; color: #4A90E2;'>🌟 برنامج تقييم الأطفال اليومي 🌟</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #777;'>أهلاً بكِ يا أستاذة ملاك. يمكنكِ رصد التقييمات وإصدار الشهادات بكل بساطة.</p>", unsafe_allow_html=True)
 st.write("---")
 
 # تهيئة ذاكرة مؤقتة لتخزين الأسماء والتقييمات للتجربة
@@ -35,7 +35,7 @@ with tab1:
                 st.session_state.students_list.append(new_student)
                 st.success(f"✅ تم إضافة الطفلة ({new_student}) بنجاح!")
             else:
-                st.warning("⚠️ هذا الاسم موجود بالفعل في القائمة.")
+                st.warning("⚠️ هذا الاسم موجود بالفعل in القائمة.")
         else:
             st.error("❌ الرجاء كتابة اسم الطفلة أولاً.")
 
